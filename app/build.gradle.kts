@@ -94,5 +94,17 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")    
+    // Charts for Analytics
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    
+    // PDF Generation
+    implementation("com.itextpdf:itext7-core:7.2.5")
+    
+    // CSV Parsing
+    implementation("com.opencsv:opencsv:5.7.1")
+    
+    // File picker for import
+    implementation("androidx.activity:activity-compose:1.8.2")
 }
+
