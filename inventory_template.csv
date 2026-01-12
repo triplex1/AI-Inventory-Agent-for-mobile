@@ -1,0 +1,6 @@
+ID,Name,Part Number,Description,Category,Quantity,Min Quantity,Location,Price,Supplier,Barcode,Created At,Updated At,Tags
+,Brake Pad Set,BP-2024-001,High-performance ceramic brake pads,brake,15,5,A-12,45.99,Premium Parts Co.,1234567890123,2024-01-15T10:30:00Z,2024-01-15T10:30:00Z,brake;ceramic;performance
+,Oil Filter,OF-2024-001,Premium synthetic oil filter,filter,30,10,B-05,12.99,FilterTech Inc.,2345678901234,2024-01-15T10:30:00Z,2024-01-15T10:30:00Z,filter;synthetic;maintenance
+,Spark Plug Set,SP-2024-001,Platinum spark plugs (4-pack),ignition,20,8,A-08,29.99,Ignition Pro,3456789012345,2024-01-15T10:30:00Z,2024-01-15T10:30:00Z,ignition;platinum;performance
+,Air Filter,AF-2024-001,High-flow air filter,filter,25,10,B-03,18.99,FilterTech Inc.,4567890123456,2024-01-15T10:30:00Z,2024-01-15T10:30:00Z,filter;performance
+,Wiper Blade Set,WB-2024-001,All-season wiper blades,accessories,40,15,C-01,24.99,Auto Accessories Co.,5678901234567,2024-01-15T10:30:00Z,2024-01-15T10:30:00Z,accessories;seasonal
