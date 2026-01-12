@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.vibeinventory.motorparts.ui.screens.analytics.AnalyticsScreen
 import com.vibeinventory.motorparts.ui.screens.inventory.InventoryListScreen
 import com.vibeinventory.motorparts.ui.screens.settings.SettingsScreen
 import com.vibeinventory.motorparts.ui.screens.voice.VoiceCommandScreen
@@ -24,29 +25,31 @@ fun MainNavigation() {
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                tonalElevation = 8.dp
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 
-                bottomNavItems.forEach { screen ->
+                bottomNavItems.forEach { item ->
                     NavigationBarItem(
-                        icon = { 
+                        icon = {
                             Icon(
-                                imageVector = screen.icon,
-                                contentDescription = screen.title
+                                imageVector = item.icon,
+                                contentDescription = item.title
                             )
                         },
-                        label = { Text(screen.title) },
-                        selected = currentDestination?.hierarchy?.any { 
-                            it.route == screen.route 
-                        } == true,
+                        label = { Text(item.title) },
+                        selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
-                            navController.navigate(screen.route) {
+                            navController.navigate(item.route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
+                                // Avoid multiple copies of the same destination
                                 launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         },
@@ -72,6 +75,9 @@ fun MainNavigation() {
             }
             composable(NavigationItem.VoiceCommand.route) {
                 VoiceCommandScreen()
+            }
+            composable(NavigationItem.Analytics.route) {
+                AnalyticsScreen()
             }
             composable(NavigationItem.Settings.route) {
                 SettingsScreen()

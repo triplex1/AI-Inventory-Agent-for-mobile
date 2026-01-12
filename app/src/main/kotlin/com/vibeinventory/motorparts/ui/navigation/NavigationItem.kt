@@ -1,6 +1,7 @@
 package com.vibeinventory.motorparts.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Settings
@@ -23,6 +24,12 @@ sealed class NavigationItem(
         icon = Icons.Default.Mic
     )
     
+    object Analytics : NavigationItem(
+        route = "analytics",
+        title = "Analytics",
+        icon = Icons.Default.Analytics
+    )
+    
     object Settings : NavigationItem(
         route = "settings",
         title = "Settings",
@@ -33,5 +40,6 @@ sealed class NavigationItem(
 val bottomNavItems = listOf(
     NavigationItem.InventoryList,
     NavigationItem.VoiceCommand,
+    NavigationItem.Analytics,
     NavigationItem.Settings
 )
