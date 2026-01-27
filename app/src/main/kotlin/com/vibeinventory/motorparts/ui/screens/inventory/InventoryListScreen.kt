@@ -1,6 +1,7 @@
 package com.vibeinventory.motorparts.ui.screens.inventory
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,22 +10,34 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vibeinventory.motorparts.data.model.InventoryItem
+import com.vibeinventory.motorparts.viewmodel.InventoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InventoryListScreen() {
-    var searchQuery by remember { mutableStateOf("") }
-    
+fun InventoryListScreen(
+    viewModel: InventoryViewModel = viewModel(),
+    onAddItem: () -> Unit = {},
+    onEditItem: (String) -> Unit = {}
+) {
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val items by viewModel.filteredItems.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Text(
                         "Inventory List",
                         style = MaterialTheme.typography.headlineMedium,
@@ -39,7 +52,7 @@ fun InventoryListScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Add new part */ },
+                onClick = onAddItem,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
@@ -56,7 +69,7 @@ fun InventoryListScreen() {
             // Search Bar
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { viewModel.updateSearchQuery(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -74,13 +87,45 @@ fun InventoryListScreen() {
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
-            
-            // Parts List (Placeholder)
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(getSampleParts()) { part ->
-                    InventoryPartCard(part)
+
+            if (isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+            }
+
+            error?.let { message ->
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
+            if (items.isEmpty() && !isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No inventory items yet.\nTap + to add your first part.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(items, key = { it.id }) { item ->
+                        InventoryItemCard(
+                            item = item,
+                            onClick = { if (item.id.isNotEmpty()) onEditItem(item.id) }
+                        )
+                    }
                 }
             }
         }
@@ -88,11 +133,23 @@ fun InventoryListScreen() {
 }
 
 @Composable
-fun InventoryPartCard(part: InventoryPart) {
+fun InventoryItemCard(
+    item: InventoryItem,
+    onClick: () -> Unit
+) {
+    val stockColor = remember(item.quantity, item.minQuantity) {
+        when {
+            item.quantity <= 0 -> MaterialTheme.colorScheme.error
+            item.quantity <= item.minQuantity -> MaterialTheme.colorScheme.secondary
+            else -> MaterialTheme.colorScheme.tertiary
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
@@ -112,52 +169,48 @@ fun InventoryPartCard(part: InventoryPart) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = part.name,
+                        text = item.name.ifBlank { "Unnamed Item" },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = part.partNumber,
+                        text = item.partNumber.ifBlank { "No part number" },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 // Stock Badge
                 Box(
                     modifier = Modifier
                         .background(
-                            color = when {
-                                part.quantity > 10 -> MaterialTheme.colorScheme.tertiary
-                                part.quantity > 0 -> MaterialTheme.colorScheme.secondary
-                                else -> MaterialTheme.colorScheme.error
-                            },
+                            color = stockColor,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "${part.quantity} in stock",
+                        text = "${item.quantity} in stock",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Location: ${part.location}",
+                    text = "Location: ${item.location.ifBlank { "N/A" }}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "$${part.price}",
+                    text = "$${item.price}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -165,25 +218,4 @@ fun InventoryPartCard(part: InventoryPart) {
             }
         }
     }
-}
-
-// Data class for inventory parts
-data class InventoryPart(
-    val id: String,
-    val name: String,
-    val partNumber: String,
-    val quantity: Int,
-    val location: String,
-    val price: Double
-)
-
-// Sample data
-fun getSampleParts(): List<InventoryPart> {
-    return listOf(
-        InventoryPart("1", "Brake Pad Set", "BP-2024-001", 15, "A-12", 45.99),
-        InventoryPart("2", "Oil Filter", "OF-2024-045", 8, "B-05", 12.50),
-        InventoryPart("3", "Spark Plug", "SP-2024-089", 25, "C-18", 8.99),
-        InventoryPart("4", "Air Filter", "AF-2024-034", 0, "B-12", 22.75),
-        InventoryPart("5", "Battery", "BT-2024-112", 3, "D-01", 129.99),
-    )
 }

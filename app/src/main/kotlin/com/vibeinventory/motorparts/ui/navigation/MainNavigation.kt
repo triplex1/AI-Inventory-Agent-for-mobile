@@ -1,17 +1,24 @@
 package com.vibeinventory.motorparts.ui.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.vibeinventory.motorparts.ui.screens.analytics.AnalyticsScreen
+import com.vibeinventory.motorparts.ui.screens.inventory.InventoryAddEditScreen
 import com.vibeinventory.motorparts.ui.screens.inventory.InventoryListScreen
 import com.vibeinventory.motorparts.ui.screens.settings.SettingsScreen
 import com.vibeinventory.motorparts.ui.screens.voice.VoiceCommandScreen
@@ -71,7 +78,32 @@ fun MainNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(NavigationItem.InventoryList.route) {
-                InventoryListScreen()
+                InventoryListScreen(
+                    onAddItem = {
+                        navController.navigate(NavigationItem.InventoryAddEdit.route)
+                    },
+                    onEditItem = { itemId ->
+                        navController.navigate(
+                            NavigationItem.InventoryAddEdit.route + "?itemId=$itemId"
+                        )
+                    }
+                )
+            }
+            composable(
+                route = NavigationItem.InventoryAddEdit.route + "?itemId={itemId}",
+                arguments = listOf(
+                    navArgument("itemId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val itemId = backStackEntry.arguments?.getString("itemId")
+                InventoryAddEditScreen(
+                    itemId = itemId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(NavigationItem.VoiceCommand.route) {
                 VoiceCommandScreen()

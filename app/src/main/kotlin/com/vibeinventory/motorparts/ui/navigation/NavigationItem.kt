@@ -17,6 +17,13 @@ sealed class NavigationItem(
         title = "Inventory",
         icon = Icons.Default.Inventory
     )
+
+    // Not shown in bottom navigation; used for add/edit screen navigation
+    object InventoryAddEdit : NavigationItem(
+        route = "inventory_add_edit",
+        title = "Inventory Form",
+        icon = Icons.Default.Inventory
+    )
     
     object VoiceCommand : NavigationItem(
         route = "voice_command",
