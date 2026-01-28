@@ -34,6 +34,7 @@ A modern Android app built with Kotlin and Jetpack Compose for managing motorpar
 ## 🚀 Features
 
 - **📱 Modern UI**: Clean, dark-mode industrial aesthetic with Material Design 3
+- **📦 Inventory Forms**: Add and edit inventory items with a simple form UI
 - **🎤 Voice Commands**: Natural language inventory management powered by Gemini AI
 - **☁️ Cloud Sync**: Real-time inventory synchronization with Firebase Firestore
 - **🤖 AI Assistant**: Intelligent inventory insights and suggestions
@@ -225,9 +226,16 @@ app/src/androidTest/kotlin/.../            # Android UI tests
 - **View all inventory**: Browse complete motorparts inventory
 - **Search & Filter**: Quick part lookup by name, category, or part number
 - **Stock Indicators**: Visual status for healthy, low, and out-of-stock items
-- **Add Items**: Floating Action Button (FAB) for adding new parts
+- **Add Items**: Floating Action Button (FAB) opens the add inventory form
 - **Real-time Sync**: Live updates from Firebase Firestore
-- **Item Details**: Tap to view/edit item information
+- **Edit Items**: Tap an item to open the edit form and update details
+
+### 1.1 Inventory Add/Edit Form
+- **Create New Items**: Enter name, part number, quantity, location, price, and category
+- **Edit Existing Items**: Pre-filled form when opened from an existing item
+- **Basic Validation**: Requires name and part number, with inline error feedback
+- **Firestore Integration**: Uses `InventoryViewModel` and `InventoryRepository` to persist changes
+- **Simple Navigation**: Back navigation returns to the inventory list after save or cancel
 
 ### 2. Voice Command
 - **Voice-to-Text**: Real-time speech recognition
@@ -382,6 +390,7 @@ Additional documentation files are available in the repository:
 - [x] **AI Integration** - Full Gemini AI command processing
 - [x] **Live Transcription** - Real-time voice-to-text display
 - [x] **Permission Handling** - Automatic microphone permission flow
+- [x] **Inventory Forms** - Add/edit form for inventory items
 - [x] **Analytics Dashboard** - Comprehensive inventory analytics with visualizations
 - [x] **CSV Export/Import** - Bulk data import and export functionality
 - [x] **PDF Report Generation** - Professional inventory reports
@@ -389,7 +398,6 @@ Additional documentation files are available in the repository:
 - [x] **Low Stock Alerts** - Automated monitoring and notifications
 
 ### 🚧 In Progress / Planned
-- [ ] **Inventory Forms** - Add/edit dialog for inventory items
 - [ ] **Barcode Scanning** - ML Kit integration for barcode scanning
 - [ ] **Offline Mode** - Local caching and sync when connection restored
 - [ ] **User Authentication** - Firebase Authentication integration
